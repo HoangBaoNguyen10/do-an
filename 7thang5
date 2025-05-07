@@ -1,0 +1,1506 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<string.h>
+struct date
+{
+    int day;
+    int month;
+    int year;
+};
+
+struct xe
+{
+    char BienSoXe[30];
+    char TenXe[50];
+    date NgayDangKiem;
+    float giaThue1gio;
+    float giaThue1Ngay;
+};
+typedef xe ItemTypeXe;
+
+struct khachHang
+{
+    char MaKH[30];
+    char HoLot[30];
+    char Ten[20];
+    date NgayThangNamSinh;
+    char SDT[15];
+    char SoCCCD[30];
+};
+typedef khachHang ItemTypeKH;
+
+struct thueXe
+{
+    char MaKH[30];
+    char BienSoXe[30];
+    date NgayThueXe;
+    date NgayTraXe;
+    int soGioThueXe; // (neu ngay thang nam tra va thue bi trung nhau)
+};
+typedef thueXe ItemTypeThueXe;
+
+// Tao mot dslk cho bai case 8
+struct thongKeSoLanThueCuaKH
+{
+    ItemTypeKH kh;
+    int CountThue;
+};
+typedef thongKeSoLanThueCuaKH ItemTypeSoLanThue;
+// SNode cho case 8
+struct SNodeLanThue
+{
+    ItemTypeSoLanThue Info;
+    SNodeLanThue* Next;
+};
+
+// Tao SNode
+struct SNodeXe
+{
+    ItemTypeXe Info;
+    SNodeXe* Next;
+};
+struct SNodeKH
+{
+    ItemTypeKH Info;
+    SNodeKH* Next;
+};
+struct SNodeThueXe
+{
+    ItemTypeThueXe Info;
+    SNodeThueXe* Next;
+};
+// Tao SList 
+struct SListXe
+{
+    SNodeXe* Head;
+    SNodeXe* Tail;
+};
+struct SListKH
+{
+    SNodeKH* Head;
+    SNodeKH* Tail;
+};
+struct SListThueXe
+{
+    SNodeThueXe* Head;
+    SNodeThueXe* Tail;
+};
+// SList cho case 8
+struct SListLanThue
+{
+    SNodeLanThue* Head;
+    SNodeLanThue* Tail;
+};
+// 3 ham init
+void initSListXe(SListXe& slx) {
+    slx.Head = slx.Tail = NULL;
+}
+void initSListKH(SListKH& slkh) {
+    slkh.Head = NULL;
+    slkh.Tail = NULL;
+}
+void initSListThueXe(SListThueXe& thueXe) {
+    thueXe.Head = NULL;
+    thueXe.Tail = NULL;
+}
+// Ham init cho case 8
+void initSListLanThue(SListLanThue& sllt)
+{
+    sllt.Head = NULL;
+    sllt.Tail = NULL;
+}
+// 3 ham isEmpty
+int isEmptySListXe(SListXe& slx) {
+    return slx.Head == NULL;
+}
+int isEmptySListKH(SListKH& slkh) {
+    return slkh.Head == NULL;
+}
+int isEmptySListThueXe(SListThueXe& thueXe) {
+    return thueXe.Head == NULL;
+}
+
+// 3 ham createSNode
+
+SNodeXe* createSNodeXe(ItemTypeXe x) {
+    SNodeXe* p = new SNodeXe();
+    if (!p) {
+        printf("Khong du bo nho cap phat !\n");
+        return NULL;
+    }
+    p->Info = x;
+    p->Next = NULL;
+    return p;
+}
+SNodeKH* createSNodeKH(ItemTypeKH x) {
+    SNodeKH* p = new SNodeKH();
+    if (!p) {
+        printf("Khong du bo nho cap phat !\n");
+        return NULL;
+    }
+    p->Info = x;
+    p->Next = NULL;
+    return p;
+}
+SNodeThueXe* createSNodeThueXe(ItemTypeThueXe x) {
+    SNodeThueXe* p = new SNodeThueXe();
+    if (!p) {
+        printf("Khong du bo nho cap phat !\n");
+        return NULL;
+    }
+    p->Info = x;
+    p->Next = NULL;
+    return p;
+}
+// Ham create cua case 8
+SNodeLanThue* createSNodeLanThue(ItemTypeSoLanThue x)
+{
+    SNodeLanThue* p = new SNodeLanThue;
+    if (p == NULL)
+    {
+        printf("\nKhong the cap phat!");
+        return NULL;
+    }
+    p->Info = x;
+    p->Next = NULL;
+    return p;
+}
+// 3 ham insertHead
+int insertHeadSNodeXe(SListXe& slx, ItemTypeXe& xe) {
+    SNodeXe* p = createSNodeXe(xe);
+    if (isEmptySListXe(slx)) {
+        slx.Head = p;
+        slx.Tail = p;
+        return 1;
+    }
+    p->Next = slx.Head;
+    slx.Head = p;
+    return 1;
+}
+int insertHeadSListKH(SListKH& slkh, ItemTypeKH& kh) {
+    SNodeKH* p = createSNodeKH(kh);
+    if (isEmptySListKH(slkh)) {
+        slkh.Head = p;
+        slkh.Tail = p;
+        return 1;
+    }
+    p->Next = slkh.Head;
+    slkh.Head = p;
+    return 1;
+}
+int insertHeadSListThueXe(SListThueXe& sltx, ItemTypeThueXe& tx) {
+    SNodeThueXe* p = createSNodeThueXe(tx);
+    if (isEmptySListThueXe(sltx)) {
+        sltx.Head = p;
+        sltx.Tail = p;
+        return 1;
+    }
+    p->Next = sltx.Head;
+    sltx.Head = p;
+    return 1;
+}
+// 3 ham insertTail
+int insertTailSListXe(SListXe& slx, ItemTypeXe& xe) {
+    SNodeXe* p = createSNodeXe(xe);
+    if (isEmptySListXe(slx)) {
+        slx.Head = slx.Tail = p;
+        return 1;
+    }
+    slx.Tail->Next = p;
+    slx.Tail = p;
+    return 1;
+}
+int insertTailSListKH(SListKH& slkh, ItemTypeKH& kh) {
+    SNodeKH* p = createSNodeKH(kh);
+    if (isEmptySListKH(slkh)) {
+        slkh.Head = slkh.Tail = p;
+        return 1;
+    }
+    slkh.Tail->Next = p;
+    slkh.Tail = p;
+    return 1;
+}
+int insertTailSListThueXe(SListThueXe& sltx, ItemTypeThueXe& tx) {
+    SNodeThueXe* p = createSNodeThueXe(tx);
+    if (isEmptySListThueXe(sltx)) {
+        sltx.Head = sltx.Tail = p;
+        return 1;
+    }
+    sltx.Tail->Next = p;
+    sltx.Tail = p;
+    return 1;
+}
+// Ham insertTail cho case 8
+int insertTailSListLanThue(SListLanThue& sllt, ItemTypeSoLanThue& x)
+{
+    SNodeLanThue* p = createSNodeLanThue(x);
+    if (p == NULL) return 0;
+
+    if (sllt.Head == NULL)
+    {
+        sllt.Head = sllt.Tail = p;
+        return 1;
+    }
+
+    sllt.Tail->Next = p;
+    sllt.Tail = p;
+    return 1;
+}
+// Ham dem so lan thue xe cua moi khach hang cho case 8
+void countSoLanThue(SListThueXe& slThue, SListKH& slkh, SListLanThue& sllt)
+{
+    initSListLanThue(sllt);
+
+    for (SNodeKH* p = slkh.Head; p != NULL; p = p->Next)
+    {
+        int count = 0;   // reset count = 0 sau moi lan lap cua p 
+
+        for (SNodeThueXe* q = slThue.Head; q != NULL; q = q->Next)
+        {
+            if (strcmp(p->Info.MaKH, q->Info.MaKH) == 0)
+            {
+                count++;
+            }
+        }
+
+        ItemTypeSoLanThue tam;
+        tam.kh = p->Info;   // Luu thong tin khach hang vao p 
+        tam.CountThue = count;   // Luu so lan thue vao countThue tu count da dem 1 vong for
+
+        insertTailSListLanThue(sllt, tam);  // Them vao dslk thong tin da co 
+    }
+}
+void swapSoLanThue(ItemTypeSoLanThue& a, ItemTypeSoLanThue& b)
+{
+    ItemTypeSoLanThue temp = a;
+    a = b;
+    b = temp;
+}
+
+void xoaKiTuThua(char* str) {
+    size_t len = strlen(str);
+    if (len > 0 && str[len - 1] == '\n') {
+        str[len - 1] = '\0';
+    }
+}
+// 3 ham showSNode
+void showSNodeXe(ItemTypeXe xe) {
+    printf("%-10s %-20s %02d/%02d/%4d                  %-20.2f %-20.2f\n", xe.BienSoXe, xe.TenXe, xe.NgayDangKiem.day, xe.NgayDangKiem.month, xe.NgayDangKiem.year, xe.giaThue1gio, xe.giaThue1Ngay);
+}
+void showSNodeKH(ItemTypeKH kh) {
+    char ngaysinh[11];
+    sprintf(ngaysinh, "%02d/%02d/%4d", kh.NgayThangNamSinh.day, kh.NgayThangNamSinh.month, kh.NgayThangNamSinh.year);
+    printf("%-15s %-15s %-10s %-15s %-15s %-15s\n", kh.MaKH, kh.HoLot, kh.Ten, ngaysinh, kh.SDT, kh.SoCCCD);
+}
+void showSNodeThueXe(ItemTypeThueXe tx) {
+    printf("%-15s %-15s %02d/%02d/%4d      %02d/%02d/%4d        %-10d\n", tx.MaKH, tx.BienSoXe, tx.NgayThueXe.day, tx.NgayThueXe.month, tx.NgayThueXe.year, tx.NgayTraXe.day, tx.NgayTraXe.month, tx.NgayTraXe.year, tx.soGioThueXe);
+}
+// 3 ham showSList
+void showSListXe(SListXe& slx) {
+    if (isEmptySListXe(slx)) {
+        printf("Danh sach xe dang rong !\n");
+        return;
+    }
+    printf("%-10s %-20s %-25s %-20s %-20s\n", "Bien So Xe", "Ten Xe", "Ngay Dang Kiem", "Gia Thue (gio)", "Gia Thue(ngay)");
+    for (SNodeXe* p = slx.Head; p != NULL; p = p->Next) {
+        showSNodeXe(p->Info);
+    }
+}
+void showSListKH(SListKH& slkh) {
+    if (isEmptySListKH(slkh)) {
+        printf("Danh Sach dang rong !\n");
+        return;
+    }
+    printf("%-15s %-15s %-10s %-15s %-15s %-15s\n", "Ma Khach Hang", "Ho Lot", "Ten", "Ngay Thang Nam Sinh", "So dien thoai", "So CCCD");
+    for (SNodeKH* p = slkh.Head; p != NULL; p = p->Next) {
+        showSNodeKH(p->Info);
+    }
+}
+void showSListThueXe(SListThueXe& sltx) {
+    if (isEmptySListThueXe(sltx)) {
+        printf("Danh sach dang rong !\n");
+        return;
+    }
+    printf("%-15s %-15s %-15s %-15s %-10s\n", "Ma Khach Hang", "Bien So Xe", "Ngay Thue Xe", "Ngay Tra Xe", "Gio Thue Xe");
+    for (SNodeThueXe* p = sltx.Head; p != NULL; p = p->Next) {
+        showSNodeThueXe(p->Info);
+    }
+}
+// Ham showSList cua so lan thue xe (case 8)
+void showThongKeSoLanThue(SListLanThue ds)
+{
+    int i = 1;
+    printf("STT | MaKH\t| TenKH\t\t\t| So lan thue\n");
+    printf("----------------------------------------------------------\n");
+    for (SNodeLanThue* p = ds.Head; p != NULL; p = p->Next)
+    {
+        printf("%-3d | %-10s | %-20s | %d\n", i++, p->Info.kh.MaKH, p->Info.kh.Ten, p->Info.CountThue);
+    }
+}
+
+void loadSListXeFromFile(SListXe& slx) {
+    initSListXe(slx);
+    FILE* f = fopen("danhmucxe.txt", "r");
+    if (!f) {
+        printf("Khong the mo file !\n");
+        return;
+    }
+    int n;
+    fscanf_s(f, "%d\n", &n);
+    for (int i = 0; i < n; i++) {
+        ItemTypeXe xe;
+        fscanf(f, "%30[^#]#%50[^#]#%d/%d/%d#%f\n", xe.BienSoXe, xe.TenXe, &xe.NgayDangKiem.day, &xe.NgayDangKiem.month, &xe.NgayDangKiem.year, &xe.giaThue1gio);
+        xe.giaThue1Ngay = 24 * xe.giaThue1gio;
+
+        insertTailSListXe(slx, xe);
+    }
+    fclose(f);
+}
+void loadSListKHFromFile(SListKH& slkh) {
+    initSListKH(slkh);
+    FILE* fi = fopen("khachhang.txt", "r");
+    if (!fi) {
+        printf("Khong the mo file !\n");
+        return;
+    }
+    int n;
+    fscanf_s(fi, "%d\n", &n);
+    for (int i = 0; i < n; i++) {
+        ItemTypeKH kh;
+        fscanf(fi, "%30[^#]#%30[^#]#%20[^#]#%d/%d/%d#%15[^#]#%30[^\n]\n", kh.MaKH, kh.HoLot, kh.Ten, &kh.NgayThangNamSinh.day, &kh.NgayThangNamSinh.month, &kh.NgayThangNamSinh.year, kh.SDT, kh.SoCCCD);
+        insertTailSListKH(slkh, kh);
+    }
+    fclose(fi);
+}
+void loadSListThueXeFromFile(SListThueXe& sltx) {
+    initSListThueXe(sltx);
+    FILE* file = fopen("thuexe.txt", "r");
+    if (!file) {
+        printf("Khong the mo file !\n");
+        return;
+    }
+    int n;
+    fscanf_s(file, "%d\n", &n);
+    for (int i = 0; i < n; i++) {
+        ItemTypeThueXe tx;
+        fscanf(file, "%30[^#]#%30[^#]#%d/%d/%d#%d/%d/%d#%d\n", tx.MaKH, tx.BienSoXe, &tx.NgayThueXe.day, &tx.NgayThueXe.month, &tx.NgayThueXe.year, &tx.NgayTraXe.day, &tx.NgayTraXe.month, &tx.NgayTraXe.year, &tx.soGioThueXe);
+        insertTailSListThueXe(sltx, tx);
+    }
+    fclose(file);
+}
+// Phai co ham tim kiem thong tin khach hang khi da biet ma khach hang
+SNodeKH* findMaKH(SListKH& slkh, char maKH[]) {
+    if (isEmptySListKH(slkh))  return NULL;
+    SNodeKH* p = slkh.Head;
+    while (p) {
+        if (strcmp(p->Info.MaKH, maKH) == 0) return p;
+        p = p->Next;
+    }
+    return NULL;
+}
+SNodeKH* findSDT(SListKH& slkh, char sdt[]) {
+    if (isEmptySListKH(slkh)) return NULL;
+    SNodeKH* p = slkh.Head;
+    while (p) {
+        if (strcmp(p->Info.SDT, sdt) == 0) return p;
+        p = p->Next;
+    }
+    return NULL;
+}
+SNodeKH* findSoCCCD(SListKH& slkh, char cccd[]) {
+    if (isEmptySListKH(slkh)) return NULL;
+    SNodeKH* p = slkh.Head;
+    while (p) {
+        if (strcmp(p->Info.SoCCCD, cccd) == 0) return p;
+        p = p->Next;
+    }
+    return NULL;
+}
+// Ham tra ve gia thue xe trong 1h khi co bien so xe
+float findGiaThueXe(char bienSoXe[], SListXe& slx) {
+    if (isEmptySListXe(slx)) return 0.0;
+    SNodeXe* p = slx.Head;
+    while (p) {
+        if (strcmp(p->Info.BienSoXe, bienSoXe) == 0) return p->Info.giaThue1gio;
+        p = p->Next;
+    }
+    return 0.0;
+}
+// Ham tim kiem ten cua KH va in ra ke ca trung ten
+void findTenKH(char tenKH[], SListKH& slkh) {
+    if (isEmptySListKH(slkh)) return;
+    int check = 0;
+    SNodeKH* p = slkh.Head;
+    while (p) {
+        if (strcmp(tenKH, p->Info.Ten) == 0) {
+            if (!check) {
+                printf("THONG TIN KHACH HANG DA DUOC TIM THAY !\n");
+                printf("%-15s %-15s %-10s %-15s %-15s %-15s\n", "Ma Khach Hang", "Ho Lot", "Ten", "Ngay Thang Nam Sinh", "So dien thoai", "So CCCD");
+                check = 1;
+            }
+            showSNodeKH(p->Info);
+        }
+        p = p->Next;
+    }
+    if (!check) {
+        printf("Khong tim thay khach hang co ten %s trong danh sach !\n", tenKH);
+    }
+}
+// Tim kiem theo nam sinh khach hang
+void findNamSinhKH(int year, SListKH& slkh) {
+    if (isEmptySListKH(slkh)) return;
+    int check = 0;
+    SNodeKH* p = slkh.Head;
+    while (p) {
+        if (year == p->Info.NgayThangNamSinh.year) {
+            if (!check) {
+                printf("THONG TIN KHACH HANG DA DUOC TIM THAY !\n");
+                printf("%-15s %-15s %-10s %-15s %-15s %-15s\n", "Ma Khach Hang", "Ho Lot", "Ten", "Ngay Thang Nam Sinh", "So dien thoai", "So CCCD");
+                check = 1;
+            }
+            showSNodeKH(p->Info);
+        }
+        p = p->Next;
+    }
+    if (!check) {
+        printf("Khong tim thay khach hang co nam sinh %d trong danh sach !\n", year);
+    }
+}
+// Ham kiem tra moc thoi gian ngay/thang/nam co nam trong khoang moc thoi gian thue xe va tra xe hay khong ?
+int kiemTraThoiGianNamTrongKhoang(int day, int month, int year, int ngayThueXe, int thangThueXe, int namThueXe, int ngayTraXe, int thangTraXe, int namTraXe) {
+    if (year > namTraXe || year < namThueXe) return 0;   // Loai bo truong hop nam nam ben ngoai khoang thoi gian
+
+    if (year == namThueXe) {
+        if (month < thangThueXe) return 0; // Neu nam = nam Thue Xe thi so sanh thang, neu thang < -> loai
+
+        if (month == thangThueXe && day < ngayThueXe) return 0; // Neu thang = thi so sanh ngay, neu ngay < -> loai
+    }
+    if (year == namTraXe) {
+        if (month > thangTraXe) return 0;
+
+        if (month == thangTraXe && day > ngayTraXe) return 0;
+    }
+
+    return 1;
+}
+float doanhThuNgay(SListThueXe& sltx, int day, int month, int year, SListXe& slx) {
+    if (isEmptySListThueXe(sltx)) return 0.0;
+    if (isEmptySListXe(slx)) return 0.0;
+
+    float doanhThu = 0.0;
+    float giaThue = 0.0;
+
+    SNodeThueXe* p = sltx.Head;
+    while (p) {
+        if (kiemTraThoiGianNamTrongKhoang(day, month, year, p->Info.NgayThueXe.day, p->Info.NgayThueXe.month, p->Info.NgayThueXe.year, p->Info.NgayTraXe.day, p->Info.NgayTraXe.month, p->Info.NgayTraXe.year)) {
+            giaThue = findGiaThueXe(p->Info.BienSoXe, slx);
+
+            if (p->Info.soGioThueXe == 0) {
+                doanhThu += giaThue * 24;
+            }
+            else if (p->Info.soGioThueXe != 0) {
+                doanhThu += p->Info.soGioThueXe * giaThue;
+            }
+        }
+        p = p->Next;
+    }
+    return doanhThu;
+}
+// Ham kiem tra co phai nam nhuan khong ?
+int kiemTraNamNhuan(int year) {
+    if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) return 1;
+    else return 0;
+}
+// Ham tra ve so ngay co trong 1 thang 
+int soNgayTrongThang(int month, int year) {
+    switch (month) {
+    case 2: {
+        if (kiemTraNamNhuan(year)) return 29; // nam nhuan 29 ngay
+        else return 28; // khong nhuan thi 28 ngay
+    }
+    case 1: case 3: case 5: case 7: case 8: case 10: case 12: return 31;
+    default:
+        return 30;
+    }
+}
+float doanhThuTuNgayDenNgay(SListThueXe& sltx, int d1, int m1, int y1, int d2, int m2, int y2, SListXe& slx) {
+    if (isEmptySListThueXe(sltx)) return 0.0;
+
+    float doanhThu = 0.0;
+    int d = d1, m = m1, y = y1;
+
+    // Vong lap se xay ra neu nam truoc < nam sau
+    // Nam truoc = nam sau nhung thang truoc < thang sau
+    // Nam truoc = nam sau, thang truoc = thang sau, nhung ngay truoc < ngay sau
+    while (y < y2 || (y == y2 && m < m2) || (y == y2 && m == m2 && d <= d2)) {
+        doanhThu += doanhThuNgay(sltx, d, m, y, slx); // tinh doanh thu trong ngay d, m, y
+
+        d++; // Tinh xong roi thi +1 de qua ngay tiep theo
+
+        if (d > soNgayTrongThang(m, y)) { // Neu so ngay vuot qua gioi han trong thang 
+            d = 1; // cho ngay ve ngay 1 (thang moi bat dau)
+            m++; // thang +1 cho thang ke tiep
+
+            if (m > 12) { // Neu thang vuot qua 12
+                m = 1; // Cho thang ve 1 (nam moi bat dau)
+                y++; // Nam + 1 cho nam ke tiep 
+            }
+        }
+    }
+    return doanhThu;
+}
+// Phai co 1 ham co chuc nang +7 ngay vao d/m/y va tra ve d'/m'/y'
+date them7Ngay(date ngayThangNam, int n) {
+    ngayThangNam.day += n; // cong so ngay can them vao ngay
+
+    while (ngayThangNam.day > soNgayTrongThang(ngayThangNam.month, ngayThangNam.year)) { // Neu so ngay cong vao vuot qua so ngay trong thang do
+        // dua so ngay bi du - so ngay trong thang do = so ngay dung hien tai 
+        ngayThangNam.day -= soNgayTrongThang(ngayThangNam.month, ngayThangNam.year);
+        ngayThangNam.month++; // qua thang ke tiep 
+
+        if (ngayThangNam.month > 12) { // Neu qua nam
+            ngayThangNam.month = 1; // thang ve lai thang 1
+            ngayThangNam.year++; // qua nam ke tiep 
+        }
+    }
+    return ngayThangNam;
+}
+
+void doanhThuTuan(SListThueXe& sltx, SListXe& slx, int d, int m, int y) {
+    if (isEmptySListThueXe(sltx)) return;
+    if (isEmptySListXe(slx)) return;
+
+    date ngayThangNamBatDau = { d, m, y };
+    date ngayThangNamSauKhiThem = them7Ngay(ngayThangNamBatDau, 6); // them 6 ngay tinh ca ngay d la 7 (1 tuan)
+
+    float loiNhuan;
+    loiNhuan = doanhThuTuNgayDenNgay(sltx, d, m, y, ngayThangNamSauKhiThem.day, ngayThangNamSauKhiThem.month, ngayThangNamSauKhiThem.year, slx);
+    printf("Doanh thu tinh theo tuan, tu %d/%d/%d den %d/%d/%d la: %.2f\n", d, m, y, ngayThangNamSauKhiThem.day, ngayThangNamSauKhiThem.month, ngayThangNamSauKhiThem.year, loiNhuan);
+}
+void swapKH(ItemTypeKH& a, ItemTypeKH& b)
+{
+    ItemTypeKH temp = a;
+    a = b;
+    b = temp;
+}
+void sapXepGiamDanTheoNamSinh(SListKH& slkh)
+{
+    if (isEmptySListKH(slkh))
+    {
+        printf("Danh sach khach hang rong!\n");
+        return;
+    }
+    for (SNodeKH* p = slkh.Head; p->Next != NULL; p = p->Next)
+    {
+        for (SNodeKH* q = p->Next; q != NULL; q = q->Next)
+        {
+            if (p->Info.NgayThangNamSinh.year < q->Info.NgayThangNamSinh.year)
+            {
+                swapKH(p->Info, q->Info);
+            }
+        }
+    }
+}
+// Sap xep so lan thue xe giam dan cua moi khach hang
+void sortSoLanThueGiamDan(SListLanThue& ds) {
+    for (SNodeLanThue* p = ds.Head; p != NULL; p = p->Next)
+    {
+        for (SNodeLanThue* q = p->Next; q != NULL; q = q->Next)
+        {
+            if (p->Info.CountThue < q->Info.CountThue)
+            {
+                swapSoLanThue(p->Info, q->Info);
+            }
+        }
+    }
+}
+// Ham dem so ngay tu d1/m1/y1 den d2/m2/y2
+int demNgay(int d1, int m1, int y1, int d2, int m2, int y2) {
+
+    int d = d1, m = m1, y = y1;
+    int countDay = 0;
+    // Vong lap se xay ra neu nam truoc < nam sau
+    // Nam truoc = nam sau nhung thang truoc < thang sau
+    // Nam truoc = nam sau, thang truoc = thang sau, nhung ngay truoc < ngay sau
+    while (y < y2 || (y == y2 && m < m2) || (y == y2 && m == m2 && d <= d2)) {
+        countDay++;
+        d++; // Tinh xong roi thi +1 de qua ngay tiep theo
+
+        if (d > soNgayTrongThang(m, y)) { // Neu so ngay vuot qua gioi han trong thang 
+            d = 1; // cho ngay ve ngay 1 (thang moi bat dau)
+            m++; // thang +1 cho thang ke tiep
+
+            if (m > 12) { // Neu thang vuot qua 12
+                m = 1; // Cho thang ve 1 (nam moi bat dau)
+                y++; // Nam + 1 cho nam ke tiep 
+            }
+        }
+    }
+    return countDay;
+}
+// Ham tim khach hang co gia thue xe thap nhat
+void timKHThueXeThapNhat(SListThueXe& sltx, SListXe& slx, SListKH& slkh) {
+    if (isEmptySListKH(slkh) || isEmptySListXe(slx) || isEmptySListThueXe(sltx)) {
+        printf("Danh sach dang rong !\n");
+        return;
+    }
+    float min = -1;  // bien luu gia thue nho nhat tim duoc 
+    float giaThue1KH = 0; // bien luu gia thue cua 1 khach hang
+    float giaThueXe1h = 0; // bien luu gia thue cua 1h cua mot xe
+
+    SNodeThueXe* p = sltx.Head;
+    SNodeThueXe* q = NULL;
+    SNodeKH* k = NULL;
+    while (p) {
+        int day = demNgay(p->Info.NgayThueXe.day, p->Info.NgayThueXe.month, p->Info.NgayThueXe.year, p->Info.NgayTraXe.day, p->Info.NgayTraXe.month, p->Info.NgayTraXe.year);
+        giaThueXe1h = findGiaThueXe(p->Info.BienSoXe, slx);  // tim gia thue 1h dua vao bien so xe
+
+        // neu ngay thue != ngay tra => thue theo ngay
+        if (p->Info.NgayThueXe.day != p->Info.NgayTraXe.day || (p->Info.NgayThueXe.month != p->Info.NgayTraXe.month) || (p->Info.NgayThueXe.year != p->Info.NgayTraXe.year)) {
+            giaThue1KH = day * giaThueXe1h * 24;  // lay so ngay thue * 1h * 24 = tong gia
+        }
+        // neu ngay thue = ngay tra => thue theo gio
+        else if ((p->Info.NgayThueXe.day == p->Info.NgayTraXe.day) && (p->Info.NgayThueXe.month == p->Info.NgayTraXe.month) && (p->Info.NgayThueXe.year == p->Info.NgayTraXe.year)) {
+            giaThue1KH = giaThueXe1h * p->Info.soGioThueXe; // lay 1h * so gio thue = tong gia
+        }
+
+        if (min > giaThue1KH || min < 0) { // Neu nho hon min 
+            min = giaThue1KH;  // luu lai gia tri 
+            q = p;
+        }
+        p = p->Next;
+    }
+    //   // sau vong lap, min se luu so tien thue cua KH nho nhat
+    //   // q se la SNodeThueXe cua KH co tien thue nho nhat
+    printf("THONG TIN KHACH HANG CO SO TIEN THUE NHO NHAT LA:\n");
+    printf("%-15s %-15s %-10s %-15s %-15s %-15s\n", "Ma Khach Hang", "Ho Lot", "Ten", "Ngay Thang Nam Sinh", "So dien thoai", "So CCCD");
+    if (!q) {
+        printf("Khong co khach hang !\n");
+        return;
+    }
+    k = findMaKH(slkh, q->Info.MaKH); // Node k = SNodeKH cua khach hang nho nhat
+    showSNodeKH(k->Info);
+    printf("Tien thue xe tong cong: %.2f\n", min);
+}
+char* timBienSoXeCoGiaThue1hCaoNhat(SListXe& slx) {
+    if (isEmptySListXe(slx)) return NULL;
+    float giaThueCaoNhat = -1.0;
+
+    SNodeXe* p = slx.Head;
+    SNodeXe* q = NULL;
+    while (p) {
+        if (p->Info.giaThue1gio > giaThueCaoNhat) {
+            giaThueCaoNhat = p->Info.giaThue1gio;
+            q = p;
+        }
+        p = p->Next;
+    }
+    if (!q) return NULL;  // Con tro q se la SNodeXe cua Xe co gia thue trong 1h cao nhat
+    return q->Info.BienSoXe;
+}
+
+void timGiaThueCaoNhat(SListThueXe& sltx, SListXe& slx, SListKH& slkh) {
+    if (isEmptySListThueXe(sltx) || isEmptySListXe(slx)) {
+        printf("Danh sach rong !\n");
+        return;
+    }
+    char bienSoXeCoGiaThueCaoNhat[30] = "";  // luu lai bien so xe
+    strcpy(bienSoXeCoGiaThueCaoNhat, timBienSoXeCoGiaThue1hCaoNhat(slx));
+    float giaThueXe = 0.0;
+
+    SNodeThueXe* p = sltx.Head;
+    while (p) {
+        if (strcmp(p->Info.BienSoXe, bienSoXeCoGiaThueCaoNhat) == 0) {
+            break; // tim bien so xe cua thue xe la bien so co gia thue cao nhat
+        }
+        p = p->Next;
+    }
+    if (!p) return;
+    SNodeKH* q = findMaKH(slkh, p->Info.MaKH);
+    giaThueXe = findGiaThueXe(bienSoXeCoGiaThueCaoNhat, slx);  // tim gia thue xe 1h cua xe cao nhat
+    printf("THONG TIN KHACH HANG THUE XE CO GIA THUE CAO NHAT:\n");
+    printf("%-15s %-15s %-10s %-15s %-15s %-15s\n", "Ma Khach Hang", "Ho Lot", "Ten", "Ngay Thang Nam Sinh", "So dien thoai", "So CCCD");
+    showSNodeKH(q->Info);
+    printf("KHACH HANG DA THUE XE CO GIA: %.2f\n", giaThueXe);
+}
+void timKHThueXeCoBienSoX(char bienSoXe[], SListThueXe& sltx, SListKH& slkh) {
+    if (isEmptySListKH(slkh) || isEmptySListThueXe(sltx)) {
+        printf("Danh sach rong !\n");
+        return;
+    }
+    SNodeThueXe* p = sltx.Head;
+    while (p) {
+        if (strcmp(bienSoXe, p->Info.BienSoXe) == 0) {
+            break;
+        }
+        p = p->Next;
+    }
+    if (!p) {
+        printf("Khong tim thay bien so xe %s trong danh sach !\n", bienSoXe);
+        return;
+    }
+    SNodeKH* q = findMaKH(slkh, p->Info.MaKH);
+    printf("THONG TIN KHACH HANG CHO THUE XE CO BIEN SO %s LA:\n", bienSoXe);
+    printf("%-15s %-15s %-10s %-15s %-15s %-15s\n", "Ma Khach Hang", "Ho Lot", "Ten", "Ngay Thang Nam Sinh", "So dien thoai", "So CCCD");
+    showSNodeKH(q->Info);
+}
+void showMenuTimKiemKHTheoTieuChi() {
+    printf("================================================================\n");
+    printf("1. Tim kiem khach hang theo tieu chi ma khach hang\n");
+    printf("2. Tim kiem khach hang theo tieu chi ten khach hang\n");
+    printf("3. Tim kiem khach hang theo tieu chi nam sinh khach hang\n");
+    printf("================================================================\n");
+    printf("Moi ban nhap vao lua chon phu hop: ");
+}
+// tim kiem theo ten khach hang, ma khach hang, nam sinh (cho lua chon tieu chi)
+void timKiemKHTheoTieuChi(SListKH& slkh) {
+    if (isEmptySListKH(slkh)) {
+        printf("Danh sach rong !\n");
+        return;
+    }
+    char maKH[30], tenKH[20];
+    int year;
+    int choice;
+    SNodeKH* p;
+
+    do
+    {
+        showMenuTimKiemKHTheoTieuChi();
+        scanf_s("%d", &choice);
+        getchar();
+
+        if (choice < 1 || choice > 3) printf("Lua chon khong phu hop !\n");
+
+        switch (choice) {
+        case 1:
+            printf("Hay nhap vao ma khach hang can tim kiem: ");
+            fgets(maKH, sizeof(maKH), stdin);
+            xoaKiTuThua(maKH);
+
+            p = findMaKH(slkh, maKH);
+            if (!p) {
+                printf("Khong tim thay ma khach hang %s trong danh sach !\n", maKH);
+                return;
+            }
+            printf("THONG TIN KHACH HANG DUOC TIM THAY !\n");
+            printf("%-15s %-15s %-10s %-15s %-15s %-15s\n", "Ma Khach Hang", "Ho Lot", "Ten", "Ngay Thang Nam Sinh", "So dien thoai", "So CCCD");
+            showSNodeKH(p->Info);
+            break;
+        case 2:
+            printf("Hay nhap vao ten khach hang can tim kiem: ");
+            fgets(tenKH, sizeof(tenKH), stdin);
+            xoaKiTuThua(tenKH);
+            findTenKH(tenKH, slkh);
+            break;
+        case 3:
+            printf("Hay nhap vao nam sinh khach hang can tim kiem: ");
+            scanf_s("%d", &year);
+            getchar();
+            findNamSinhKH(year, slkh);
+            break;
+        default:
+            break;
+        }
+    } while (choice < 1 || choice > 3);
+}
+
+void showMenuCapNhatKH() {
+    printf("================================================================\n");
+    printf("1. Cap Nhat Ma Khach Hang\n");
+    printf("2. Cap Nhat Ho Lot\n");
+    printf("3. Cap Nhat Ten\n");
+    printf("4. Cap Nhat Ngay Thang Nam Sinh\n");
+    printf("5. Cap Nhat So Dien Thoai\n");
+    printf("6. Cap Nhat So CCCD\n");
+    printf("================================================================\n");
+    printf("Moi ban nhap vao lua chon: ");
+}
+void capNhatMaKH(char maKhachHang[], SNodeKH* p) {
+    strcpy(p->Info.MaKH, maKhachHang);
+}
+void capNhatHoLot(char hoLot[], SNodeKH* p) {
+    strcpy(p->Info.HoLot, hoLot);
+}
+void capNhatTen(char ten[], SNodeKH* p) {
+    strcpy(p->Info.Ten, ten);
+}
+void capNhatSDT(char sdt[], SNodeKH* p) {
+    strcpy(p->Info.SDT, sdt);
+}
+void capNhatSoCCCD(char cccd[], SNodeKH* p) {
+    strcpy(p->Info.SoCCCD, cccd);
+}
+void capNhatNgayThangNamSinh(int day, int month, int year, SNodeKH* p) {
+    p->Info.NgayThangNamSinh.day = day;
+    p->Info.NgayThangNamSinh.month = month;
+    p->Info.NgayThangNamSinh.year = year;
+}
+void capNhatFileKH(SListKH& slkh) {
+    FILE* f = fopen("khachhang.txt", "r");
+    if (!f) {
+        printf("Khong the mo file !\n");
+        return;
+    }
+    int n;
+    fscanf_s(f, "%d", &n);
+    fclose(f);
+
+    f = fopen("khachhang.txt", "w");
+    fprintf(f, "%d", n);
+    SNodeKH* p = slkh.Head;
+
+    for (int i = 0; i < n; i++) {
+        fprintf(f, "%s#%s#%s#%d/%d/%d#%s#%s\n", p->Info.MaKH, p->Info.HoLot, p->Info.Ten, p->Info.NgayThangNamSinh.day, p->Info.NgayThangNamSinh.month, p->Info.NgayThangNamSinh.year, p->Info.SDT, p->Info.SoCCCD);
+        p = p->Next;
+    }
+    fclose(f);
+}
+// Ham sua doi thong tin kh chung
+void capNhatThongTinKH(SListKH& slkh, char maKH[]) {
+    SNodeKH* p;
+    p = findMaKH(slkh, maKH);
+    if (!p) {
+        printf("Khong tim thay ma khach hang theo yeu cau !\n");
+        return;
+    }
+    printf("Thong tin khach hang da duoc tim thay !\n");
+    printf("%-15s %-15s %-10s %-15s %-15s %-15s\n", "Ma Khach Hang", "Ho Lot", "Ten", "Ngay Thang Nam Sinh", "So dien thoai", "So CCCD");
+    showSNodeKH(p->Info);
+
+    printf("Ban muon cap nhat lai thong tin nao ?\n");
+    int update, day, month, year;
+    char maKhachHang[30], holot[30], ten[20], sdt[15], soCCCD[30];
+    SNodeKH* q;
+    showMenuCapNhatKH();
+    scanf_s("%d", &update);
+    getchar();
+
+    do
+    {
+        if (update < 1 || update > 6) printf("Lua chon nhap khong hop le !\n");
+
+        switch (update) {
+        case 1:
+            printf("Ban hay nhap lai ma khach hang moi ban muon cap nhat: ");
+            fgets(maKhachHang, sizeof(maKhachHang), stdin);
+            xoaKiTuThua(maKhachHang);
+            q = findMaKH(slkh, maKhachHang);
+            if (q) {
+                printf("Ma Khach Hang Cap Nhat Khong Duoc Phep Trung Voi Ma Khach Hang Da Co !\n");
+                return;
+            }
+            capNhatMaKH(maKhachHang, p);  // Cap nhat lai danh sach lien ket cho thong tin moi 
+            capNhatFileKH(slkh);  // Ghi lai dslk da cap nhat vao lai file  
+            showSListKH(slkh);
+            break;
+        case 2:
+            printf("Ban hay nhap lai ho lot ma ban muon cap nhat: ");
+            fgets(holot, sizeof(holot), stdin);
+            xoaKiTuThua(holot);
+
+            capNhatHoLot(holot, p);
+            capNhatFileKH(slkh);
+            showSListKH(slkh);
+            break;
+        case 3:
+            printf("Ban hay nhap lai ten ma ban muon cap nhat: ");
+            fgets(ten, sizeof(ten), stdin);;
+            xoaKiTuThua(ten);
+            capNhatTen(ten, p);
+            capNhatFileKH(slkh);
+            showSListKH(slkh);
+            break;
+        case 4:
+            printf("Ban hay nhap lai ngay ban muon cap nhat: ");
+            do
+            {
+                scanf_s("%d", &day);
+                if (day < 0 || day > 31) printf("Ngay nhap khong hop le !\n");
+            } while (day < 0 || day > 31);
+            getchar();
+            printf("Ban hay nhap lai thang ban muon cap nhat: ");
+            do
+            {
+                scanf_s("%d", &month);
+                if (month < 0 || month > 12) printf("Thang nhap khong hop le !\n");
+            } while (month < 0 || month > 12);
+            getchar();
+            printf("Ban hay nhap lai nam ban muon cap nhat: ");
+            do
+            {
+                scanf_s("%d", &year);
+                if (year > 2007) printf("Ban chua du tuoi lai xe !\n");
+            } while (year > 2007);
+            getchar();
+            capNhatNgayThangNamSinh(day, month, year, p);
+            capNhatFileKH(slkh);
+            showSListKH(slkh);
+            break;
+        case 5:
+            printf("Ban hay nhap lai so dien thoai ma ban muon cap nhat: ");
+            fgets(sdt, sizeof(sdt), stdin);
+            xoaKiTuThua(sdt);
+
+            q = findSDT(slkh, sdt);
+            if (q) {
+                printf("KHONG THE CO SO DIEN THOAI BI TRUNG !\n");
+                return;
+            }
+            capNhatSDT(sdt, p);
+            capNhatFileKH(slkh);
+            showSListKH(slkh);
+            break;
+        case 6:
+            printf("Ban hay nhap lai so CCCD ma ban muon cap nhat: ");
+            fgets(soCCCD, sizeof(soCCCD), stdin);
+            xoaKiTuThua(soCCCD);
+            q = findSoCCCD(slkh, soCCCD);
+            if (q) {
+                printf("KHONG THE CO SO CCCD BI TRUNG !\n");
+                return;
+            }
+            capNhatSoCCCD(soCCCD, p);
+            capNhatFileKH(slkh);
+            showSListKH(slkh);
+            break;
+        default:
+            break;
+        }
+
+    } while (update < 1 || update > 6);
+
+}
+// Phai co 3 ham xet trung thong tin khi nhap tay vao la: ma khach hang, so dien thoai, so CCCD
+int xetTrungMaKH(char maKH[], SListKH& slkh) {
+    SNodeKH* p = slkh.Head;
+    while (p) {
+        if (strcmp(maKH, p->Info.MaKH) == 0) return 0; // bi trung
+        p = p->Next;
+    }
+    return 1;
+}
+int xetTrungSDT(char soDT[], SListKH& slkh) {
+    SNodeKH* p = slkh.Head;
+    while (p) {
+        if (strcmp(soDT, p->Info.SDT) == 0) return 0; // bi trung
+        p = p->Next;
+    }
+    return 1;
+}
+int xetTrungCCCD(char CCCD[], SListKH& slkh) {
+    SNodeKH* p = slkh.Head;
+    while (p) {
+        if (strcmp(CCCD, p->Info.SoCCCD) == 0) return 0; // bi trung
+        p = p->Next;
+    }
+    return 1;
+}
+int xetTrungBienSoXe(char bienSoXe[], SListThueXe& sltx) {
+    SNodeThueXe* p = sltx.Head;
+    while (p) {
+        if (strcmp(bienSoXe, p->Info.BienSoXe) == 0) return 0; // bi trung
+        p = p->Next;
+    }
+    return 1;
+}
+
+// Ham nhap thong tin khach hang
+void nhapThongTinKH(ItemTypeKH& kh) {
+    printf("Moi nhap vao ma khach hang: ");
+    fgets(kh.MaKH, sizeof(kh.MaKH), stdin);
+    xoaKiTuThua(kh.MaKH);
+
+
+    printf("Moi nhap vao ho lot: ");
+    fgets(kh.HoLot, sizeof(kh.HoLot), stdin);
+    xoaKiTuThua(kh.HoLot);
+
+    printf("Moi nhap vao ten khach hang: ");
+    fgets(kh.Ten, sizeof(kh.Ten), stdin);
+    xoaKiTuThua(kh.Ten);
+
+    printf("Moi nhap vao ngay sinh: ");
+    scanf_s("%d", &kh.NgayThangNamSinh.day);
+    getchar();
+
+    printf("Moi nhap vao thang sinh: ");
+    scanf_s("%d", &kh.NgayThangNamSinh.month);
+    getchar();
+
+    printf("Moi nhap vao nam sinh: ");
+    scanf_s("%d", &kh.NgayThangNamSinh.year);
+    getchar();
+
+    printf("Moi nhap vao so dien thoai: ");
+    fgets(kh.SDT, sizeof(kh.SDT), stdin);
+    xoaKiTuThua(kh.SDT);
+
+    printf("Moi nhap vao so CCCD: ");
+    fgets(kh.SoCCCD, sizeof(kh.SoCCCD), stdin);
+    xoaKiTuThua(kh.SoCCCD);
+}
+void nhapThongTinKHThueXe(ItemTypeThueXe& thueXe, SListKH& slkh) {
+    SNodeKH* p = slkh.Tail;
+    strcpy(thueXe.MaKH, p->Info.MaKH);
+
+    printf("Moi nhap vao bien so xe: ");
+    fgets(thueXe.BienSoXe, sizeof(thueXe.BienSoXe), stdin);
+    xoaKiTuThua(thueXe.BienSoXe);
+
+    printf("Moi nhap vao ngay thue xe: ");
+    scanf_s("%d", &thueXe.NgayThueXe.day);
+    getchar();
+
+    printf("Moi nhap vao thang thue xe: ");
+    scanf_s("%d", &thueXe.NgayThueXe.month);
+    getchar();
+
+    printf("Moi nhap vao nam thue xe: ");
+    scanf_s("%d", &thueXe.NgayThueXe.year);
+    getchar();
+
+    printf("Moi nhap vao ngay tra xe: ");
+    scanf_s("%d", &thueXe.NgayTraXe.day);
+    getchar();
+
+    printf("Moi nhap vao thang tra xe: ");
+    scanf_s("%d", &thueXe.NgayTraXe.month);
+    getchar();
+
+    printf("Moi nhap vao nam tra xe: ");
+    scanf_s("%d", &thueXe.NgayTraXe.year);
+    getchar();
+
+    if ((thueXe.NgayThueXe.day == thueXe.NgayTraXe.day) && (thueXe.NgayThueXe.month == thueXe.NgayTraXe.month) && (thueXe.NgayThueXe.year == thueXe.NgayTraXe.year)) {
+        // Neu ngay/thang/nam thue = ngay/thang/nam tra => thue theo gio
+        printf("Moi nhap vao so gio thue xe: ");
+        scanf_s("%d", &thueXe.soGioThueXe);
+        getchar();
+    }
+    else {
+        thueXe.soGioThueXe = 0; // nguoc lai thi thue theo ngay => gio = 0
+    }
+
+}
+void nhapThongTinXe(ItemTypeXe& xe, SListThueXe& sltx) {
+    SNodeThueXe* p = sltx.Tail;
+    strcpy(xe.BienSoXe, p->Info.BienSoXe);
+
+    printf("Moi nhap vao ten xe: ");
+    fgets(xe.TenXe, sizeof(xe.TenXe), stdin);
+    xoaKiTuThua(xe.TenXe);
+
+    printf("Moi nhap vao ngay dang kiem xe: ");
+    scanf_s("%d", &xe.NgayDangKiem.day);
+    getchar();
+
+    printf("Moi nhap vao thang dang kiem xe: ");
+    scanf_s("%d", &xe.NgayDangKiem.month);
+    getchar();
+
+    printf("Moi nhap vao nam dang kiem xe: ");
+    scanf_s("%d", &xe.NgayDangKiem.year);
+    getchar();
+
+    printf("Moi nhap vao gia thue xe 1 gio: ");
+    scanf_s("%f", &xe.giaThue1gio);
+    getchar();
+
+    xe.giaThue1Ngay = 24 * xe.giaThue1gio;
+}
+void showMenuKhachHang() {
+    printf("===============================================================================\n");
+    printf("*****************   CHAO MUNG KHACH HANG DEN VOI CONG TY !   ******************\n");
+    printf("*******************************************************************************\n");
+    printf("0. Thoat khoi he thong !\n");
+    printf("1. In ra cac khach hang da thue xe trong cong ty\n");
+    printf("2. Tim kiem khach hang theo cac tieu chi (ten khach hang, ma khach hang, nam sinh)\n");
+    printf("3. Xem thong tin khach hang co bien so x\n");
+    printf("4. Cap nhat lai thong tin cua khach hang neu co sai sot\n");
+    printf("*******************************************************************************\n");
+    printf("*******************************************************************************\n");
+    printf("Ban hay nhap vao lua chon thich hop !: ");
+}
+void showMenuTinhDoanhThu() {
+    printf("================================================================\n");
+    printf("1. Tinh doanh thu 1 ngay\n");
+    printf("2. Tinh doanh thu 1 tuan\n");
+    printf("3. Tinh doanh thu 1 thang\n");
+    printf("4. Tinh doanh thu 1 quy\n");
+    printf("5. Tinh doanh thu 1 nam\n");
+    printf("6. Tinh doanh thu tu ngay den ngay\n");
+    printf("================================================================\n");
+    printf("Ban hay nhap vao lua chon cua ban: ");
+}
+void tinhDoanhThuTongHop(SListThueXe& sltx, SListXe& slx) {
+    int choice, day, month, year;
+    int daykt, monthkt, yearkt, quy;
+    float loiNhuan;
+    do
+    {
+        showMenuTinhDoanhThu();
+        scanf_s("%d", &choice);
+        if (choice < 1 || choice > 6) printf("Lua chon nhap khong hop le !\n");
+
+        switch (choice) {
+        case 1:
+            printf("Hay nhap vao ngay: ");
+            scanf_s("%d", &day);
+            getchar();
+
+            printf("Hay nhap vao thang: ");
+            scanf_s("%d", &month);
+            getchar();
+
+            printf("Hay nhap vao nam: ");
+            scanf_s("%d", &year);
+            getchar();
+
+            loiNhuan = doanhThuNgay(sltx, day, month, year, slx);
+            printf("Loi nhuan cua ngay %d/%d/%d la: %.2f\n", day, month, year, loiNhuan);
+            break;
+        case 2: // tinh doanh thu tuan
+            printf("Hay nhap vao ngay: ");
+            scanf_s("%d", &day);
+            getchar();
+
+            printf("Hay nhap vao thang: ");
+            scanf_s("%d", &month);
+            getchar();
+
+            printf("Hay nhap vao nam: ");
+            scanf_s("%d", &year);
+            getchar();
+
+            doanhThuTuan(sltx, slx, day, month, year);
+            break;
+        case 3:
+            printf("Hay nhap vao thang can thong ke: ");
+            scanf_s("%d", &month);
+            getchar();
+
+            printf("Hay nhap vao nam can thong ke: ");
+            scanf_s("%d", &year);
+            getchar();
+
+            day = soNgayTrongThang(month, year); // lay du lieu so ngay tuong ung voi thang trong nam 
+
+            // tinh doanh thu tu 1/m/y den day/m/y
+            loiNhuan = doanhThuTuNgayDenNgay(sltx, 1, month, year, day, month, year, slx);
+            printf("Doanh thu cong ty trong thang %d nam %d la: %.2f\n", month, year, loiNhuan);
+            break;
+        case 4:
+            do
+            {
+                printf("Hay nhap vao quy can tinh doanh thu: ");
+                scanf_s("%d", &quy);
+                getchar();
+
+                printf("Hay nhap vao nam can tinh doanh thu: ");
+                scanf_s("%d", &year);
+                getchar();
+                if ((quy < 0 || quy > 4) || (year < 1950 || year > 2025)) printf("Du lieu nhap vao khong phu hop !\n");
+            } while ((quy < 0 || quy > 4) || (year < 1950 || year > 2025));
+
+            if (quy == 1) { // Tinh doanh thu tu thang 1 - 3
+                loiNhuan = doanhThuTuNgayDenNgay(sltx, 1, 1, year, 31, 3, year, slx);
+                printf("Doanh thu cong ty quy I la: %.2f\n", loiNhuan);
+                return;
+            }
+            else if (quy == 2) { // Doanh thu tu thang 4 - 6
+                loiNhuan = doanhThuTuNgayDenNgay(sltx, 1, 4, year, 30, 6, year, slx);
+                printf("Doanh thu cong ty quy II la: %.2f\n", loiNhuan);
+                return;
+            }
+            else if (quy == 3) {  // Doanh thu tu thang 7 - 9
+                loiNhuan = doanhThuTuNgayDenNgay(sltx, 1, 7, year, 30, 9, year, slx);
+                printf("Doanh thu cong ty quy III la: %.2f\n", loiNhuan);
+                return;
+            }
+            else { // Doanh thu tu thang 10 - 12
+                loiNhuan = doanhThuTuNgayDenNgay(sltx, 1, 10, year, 31, 12, year, slx);
+                printf("Doanh thu cong ty quy IV la: %.2f\n", loiNhuan);
+                return;
+            }
+            break;
+        case 5:
+            printf("Ban hay nhap vao nam ma ban can thong ke: ");
+            scanf_s("%d", &year);
+            getchar();
+
+            // Doanh thu 1 nam bat dau tu 1/1/y den het 31/12/y
+            loiNhuan = doanhThuTuNgayDenNgay(sltx, 1, 1, year, 31, 12, year, slx);
+            printf("Doanh thu cua cong ty vao nam %d la %.2f\n", year, loiNhuan);
+            break;
+        case 6:
+            printf("Hay nhap vao ngay bat dau: ");
+            scanf_s("%d", &day);
+            getchar();
+
+            printf("Hay nhap vao thang bat dau: ");
+            scanf_s("%d", &month);
+            getchar();
+
+            printf("Hay nhap vao nam bat dau: ");
+            scanf_s("%d", &year);
+            getchar();
+
+            printf("Hay nhap vao ngay ket thuc: ");
+            scanf_s("%d", &daykt);
+            getchar();
+
+            printf("Hay nhap vao thang ket thuc: ");
+            scanf_s("%d", &monthkt);
+            getchar();
+
+            printf("Hay nhap vao nam ket thuc: ");
+            scanf_s("%d", &yearkt);
+            getchar();
+
+            loiNhuan = doanhThuTuNgayDenNgay(sltx, day, month, year, daykt, monthkt, yearkt, slx);
+            printf("Doanh thu cong ty tu ngay %d/%d/%d den %d/%d/%d la %.2f\n", day, month, year, daykt, monthkt, yearkt, loiNhuan);
+            break;
+        default:
+            break;
+        }
+
+    } while (choice < 1 || choice > 6);
+
+}
+void showLogo() {
+    printf("=====================================================================\n");
+    printf(" _____   __     _____  _____  __        __ _  \   _ ______  _____    __ \n");
+    printf("|  ___| /  \\   /  ___||_   _| \\ \\      / /| |   | || ____|| ____|  | |\n");
+    printf("| |__  //_\\ \\  \\ `--.   | |    \\ \\ /\\ / / | |___| || |__  | |__    | |  \n");
+    printf("|  __|/ ____ \\  `--. \\  | |     \\ V  V /  |  ___  ||  __| |  __|   | |  \n");
+    printf("| |  / /    \\ \\/\\__/ /  | |      \\ /\\ /   | |   | || |___ | |___   | |___  \n");
+    printf("|_| /_/      \\\_\\____/   |_|       \\__/    \|_|   |_||_____||_____|  |_____|    \n");
+    printf("                                                                        \n");
+    printf("\n");
+    printf("               CONG TY CHO THUE XE HOI TU LAI FAST WHEEL          \n");
+    printf("=====================================================================\n");
+    printf("\n");
+
+    printf("                 ______\n");
+    printf("  ______________//_||_\\\\________________\n");
+    printf(" | ___ ___ ___ | [_]  [_]  [_]  [_]  [_]| \n");
+    printf(" ||___|___|___||_______________________| \n");
+    printf(" |  ___ ___ ___ ___  ___ ___ ___ ___  | \n");
+    printf(" | |___|___|___|___||___|___|___|___| | \n");
+    printf(" '---(o)-----------------------(o)----' \n");
+
+    printf("\n");
+    printf(" Hotline: 0911188937 |  Website: xehoitulaifastwheel.com.vn\n");
+    printf("=====================================================================\n");
+    printf("Ban dang dang nhap vao he thong voi tu cach la:\n");
+    printf("0. Ban muon thoat khoi he thong !\n");
+    printf("1. Chu cong ty\n");
+    printf("2. Khach hang thue xe\n");
+    printf("Moi ban nhap lua chon cua minh: ");
+}
+void showMenuChuCongTy() {
+    printf("===============================================================================\n");
+    printf("*****************   CHAO MUNG BAN DA QUAY TRO LAI CONG TY !   *****************\n");
+    printf("*******************************************************************************\n");
+    printf("0. Thoat khoi he thong !\n");
+    printf("1. Tao thong tin cac khach hang da thue xe\n");
+    printf("2. Them 1 khach hang vao danh sach thue xe\n");
+    printf("3. Tim kiem khach hang theo cac tieu chi (ten khach hang, ma khach hang, nam sinh)\n");
+    printf("4. In ra danh sach khach hang co bien so x\n");
+    printf("5. Tim thong tin khach hang tra tien thue xe it nhat\n");
+    printf("6. Tim thong tin cac khach hang da thue xe co gia thue cao nhat\n");
+    printf("7. Sap xep khach hang giam dan theo nam sinh\n");
+    printf("8. In ra danh sach khach hang va so lan thue xe cua khach hang\n");
+    printf("9. Cho phep cap nhat thong tin khach hang khi biet ma khach hang\n");
+    printf("10. Thong ke doanh thu theo Ngay/Tuan/Thang/Nam, tu ngay den ngay\n");
+    printf("*********************CAC TINH NANG BO SUNG******************\n");
+    printf("11. Nhap vao khoan tien muon thue, de xuat cac xe trong khoan tien do\n");
+    printf("12. Kiem xe cac xe sap den han tra\n");
+    printf("13. Tim nhung khach hang co so lan thue tren x lan(co the ap dung de giam gia lan thue sau)\n");
+    printf("14. Xuat xe duoc thue nhieu nhat trong thang\n");
+    printf("15. Tim nhung khach hang thue tren 3 lan, ghi vao file, va giam 10% cho lan thue tiep theo\n");
+    printf("16. Sap xep xe theo gia tien\n");
+    printf("17. In danh sach tinh trang xe\n");
+    printf("18. Thong ke lich su cac khach tung thue xe co bien so x");
+    printf("19. Phan loai khach hang theo tong tien da bo ra de thue xe(co the dung chuc nang nay de tang qua)");
+    printf("*******************************************************************************\n");
+    printf("*******************************************************************************\n");
+    printf("Ban hay nhap vao lua chon thich hop !: ");
+}
+void phanQuyen() {
+    int capQuyen;
+    SListLanThue sllt;
+    SListXe slx;
+    SListKH slkh;
+    SListThueXe sltx;
+    ItemTypeKH kh;
+    ItemTypeThueXe thuexe;
+    ItemTypeXe xe;
+    initSListKH(slkh);
+    initSListXe(slx);
+    initSListThueXe(sltx);
+    char maKH[30];
+    /*int day, month, year;
+    float loiNhuanNgay; */
+    char bienSoXe[30];
+    int choice;
+    do
+    {
+        showLogo();
+        scanf_s("%d", &capQuyen);
+        getchar();
+    } while (capQuyen < 0 || capQuyen > 2);
+
+    switch (capQuyen) {
+    case 0:
+        printf("Da thoat khoi he thong, cam on ban da su dung !\n");
+        break;
+    case 1:
+        do
+        {
+            showMenuChuCongTy();
+            scanf_s("%d", &choice);
+            getchar();
+            if (choice < 0 || choice > 10) printf("Nhap lua chon khong hop le !\n");
+
+            switch (choice) {
+            case 0:
+                printf("Da thoat khoi he thong !\n");
+                break;
+            case 1:
+                loadSListXeFromFile(slx);
+                showSListXe(slx);
+                printf("\n");
+                loadSListKHFromFile(slkh);
+                showSListKH(slkh);
+                printf("\n");
+                loadSListThueXeFromFile(sltx);
+                showSListThueXe(sltx);
+                // Tam thoi chua co ham doc file thue xe
+                break;
+            case 2:
+                // Phai doc trong file truoc roi moi them vao khach hang moi
+                printf("CAC THONG TIN KHACH HANG DA THUE XE CUA CONG TY DA DUOC IN RA O TREN !\n");
+                printf("VUI LONG NHAP THONG TIN KHACH HANG MOI KHONG DUOC TRUNG LAP THONG TIN VOI KHACH HANG CU !\n");
+                do
+                {
+                    nhapThongTinKH(kh);
+                    if (xetTrungMaKH(kh.MaKH, slkh) == 0 || xetTrungCCCD(kh.SoCCCD, slkh) == 0 || xetTrungSDT(kh.SDT, slkh) == 0) {
+                        printf("Thong tin ma ban nhap vao bi trung voi cac thong tin khac !\n");
+                        printf("Vui long kiem tra lai ma khach hang, so CCCD, so dien thoai !\n");
+                    }
+                } while (xetTrungMaKH(kh.MaKH, slkh) == 0 || xetTrungCCCD(kh.SoCCCD, slkh) == 0 || xetTrungSDT(kh.SDT, slkh) == 0);
+
+                insertTailSListKH(slkh, kh);
+                showSListKH(slkh);
+                do
+                {
+                    nhapThongTinKHThueXe(thuexe, slkh);
+                    if (xetTrungBienSoXe(thuexe.BienSoXe, sltx) == 0) {
+                        printf("Thong tin ma ban nhap vao bi trung voi cac thong tin khac !\n");
+                        printf("Vui long kiem tra lai bien so xe !\n");
+                    }
+                } while (xetTrungBienSoXe(thuexe.BienSoXe, sltx) == 0);
+                insertTailSListThueXe(sltx, thuexe);
+                showSListThueXe(sltx);
+
+                nhapThongTinXe(xe, sltx);
+                insertTailSListXe(slx, xe);
+                showSListXe(slx);
+                break;
+            case 3:
+                timKiemKHTheoTieuChi(slkh);
+                break;
+            case 4:
+                printf("Ban hay nhap vao bien so xe can tim: ");
+                fgets(bienSoXe, sizeof(bienSoXe), stdin);
+                xoaKiTuThua(bienSoXe);
+                timKHThueXeCoBienSoX(bienSoXe, sltx, slkh);
+                break;
+            case 5:
+                timKHThueXeThapNhat(sltx, slx, slkh);
+                break;
+            case 6:
+                timGiaThueCaoNhat(sltx, slx, slkh);
+                break;
+            case 7:
+                sapXepGiamDanTheoNamSinh(slkh);
+                showSListKH(slkh);
+                break;
+            case 8:
+                countSoLanThue(sltx, slkh, sllt);
+                sortSoLanThueGiamDan(sllt);
+                printf("DANH SACH KHACH HANG VA SO LAN THUE \n");
+                showThongKeSoLanThue(sllt);
+                break;
+            case 9:
+                // Cap nhat lai thong tin cho cac khach hang khi biet ma khach hang 
+                printf("Nhap ma khach hang can cap nhat ! ");
+                fgets(maKH, sizeof(maKH), stdin);
+                xoaKiTuThua(maKH);
+
+                capNhatThongTinKH(slkh, maKH);
+                break;
+            case 10:
+                tinhDoanhThuTongHop(sltx, slx);
+                break;
+            default:
+                break;
+            }
+        } while (choice != 0);
+        break;
+    case 2:
+        do
+        {
+            showMenuKhachHang();
+            scanf_s("%d", &choice);
+            getchar();
+
+            switch (choice)
+            {
+            case 0:
+                printf("Da thoat chuong trinh !\n");
+                break;
+            case 1:
+                loadSListXeFromFile(slx);
+                showSListXe(slx);
+                printf("\n");
+                loadSListKHFromFile(slkh);
+                showSListKH(slkh);
+                printf("\n");
+                loadSListThueXeFromFile(sltx);
+                showSListThueXe(sltx);
+                break;
+            case 2:
+                timKiemKHTheoTieuChi(slkh);
+                break;
+            case 3:
+                printf("Ban hay nhap vao bien so xe can tim: ");
+                fgets(bienSoXe, sizeof(bienSoXe), stdin);
+                xoaKiTuThua(bienSoXe);
+                timKHThueXeCoBienSoX(bienSoXe, sltx, slkh);
+                break;
+            case 4:
+                printf("Nhap ma khach hang can cap nhat ! ");
+                fgets(maKH, sizeof(maKH), stdin);
+                xoaKiTuThua(maKH);
+                capNhatThongTinKH(slkh, maKH);
+                break;
+            default:
+                break;
+            }
+
+            if (choice < 0 || choice > 3) printf("Lua chon nhap khong hop le !\n");
+
+        } while (choice != 0);
+        break;
+    default:
+        break;
+    }
+}
+int main() {
+    phanQuyen();
+
+}
+
+
